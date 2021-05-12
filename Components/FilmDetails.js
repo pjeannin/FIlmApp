@@ -1,17 +1,23 @@
 import React from "react";
-import {ActivityIndicator, Image, ScrollView, StyleSheet, Text, View} from "react-native";
+import {
+    ActivityIndicator,
+    Button,
+    Image,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View
+} from "react-native";
 import {getImageFromApi} from "../API/filmAPI";
 import {getOneFilmFromApi} from "../API/filmAPI";
 import moment from "moment/moment";
 import numeral from 'numeral/numeral'
+import { connect} from "react-redux";
 
 class FilmDetails extends React.Component {
     constructor(props) {
         super(props)
-        this.setState({
-            film: undefined,
-            isLoading: true
-        })
+        this.state = { film: undefined, isLoading: true}
     }
 
     componentDidMount() {
@@ -23,6 +29,11 @@ class FilmDetails extends React.Component {
         })
     }
 
+    componentDidUpdate() {
+        console.log("Update:")
+        console.log(this.props.favoritesFilms)
+    }
+
     _displayLoading() {
         return (
             <View style={styles.loading_container}>
@@ -31,10 +42,16 @@ class FilmDetails extends React.Component {
         )
     }
 
+    _toggleFavorite() {
+        const action = { type: 'TOGGLE_FAVORITE', value: this.state.film }
+        this.props.dispatch(action)
+    }
+
     _displayFilm() {
         const film = this.state.film
 
-        console.log(film)
+        if (this.state.film === undefined)
+            return (this._displayLoading())
 
         return (
             <ScrollView style={styles.mainContainer}>
@@ -42,6 +59,7 @@ class FilmDetails extends React.Component {
                        source={{uri: getImageFromApi(film.backdrop_path)}}/>
                 <Text style={styles.title}>{film.title}</Text>
                 <Text style={styles.originalTitle}>{"Titre Original : " + film.original_title}</Text>
+                <Button title="Favoris" onPress={() => this._toggleFavorite()}/>
                 <View style={styles.resumeContainer}>
                     <Text style={styles.overview}>{"Résumé : " + film.overview}</Text>
                 </View>
@@ -152,4 +170,8 @@ const styles = StyleSheet.create({
     }
 })
 
-export default FilmDetails
+const mapStateToProps = (state) => {
+    return { favoritesFilms: state.favoritesFilms }
+}
+
+export default connect(mapStateToProps)(FilmDetails)

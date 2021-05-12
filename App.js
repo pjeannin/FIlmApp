@@ -1,10 +1,12 @@
 import React from 'react';
-import Search from './Components/Search';
 import Navigation from "./Navigation/Navigation";
-import Welcome from "./Components/Welcome";
+import Store from "./Store/ConfigureStore.js"
+import { Provider} from "react-redux";
 
 export default function App() {
     return (
-        <Navigation/>
+        <Provider store={Store}>
+            <Navigation/>
+        </Provider>
     );
 }
